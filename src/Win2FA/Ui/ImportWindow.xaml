@@ -1,0 +1,42 @@
+<Window x:Class="Win2FA.Ui.ImportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Win2FA · Hesap ekle" Width="480" SizeToContent="Height"
+        Background="{StaticResource Bg}" Foreground="{StaticResource Fg}" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+    <StackPanel Margin="20">
+        <TextBlock Text="Google Authenticator'dan aktar" FontSize="17" FontWeight="SemiBold"/>
+        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Fg2}" Margin="0,6,0,10" FontSize="12.5">
+            Telefonda Google Authenticator → ☰ menü → <Bold>Hesapları aktar</Bold> → <Bold>Hesapları dışa aktar</Bold>.
+            Çıkan QR kodu(ları) kameraya göster. Birden fazla QR varsa sırayla göster; ilerlemeyi burada görürsün.
+        </TextBlock>
+        <WrapPanel>
+            <Button Style="{StaticResource Primary}" Content="📷  Kamerayla oku" Click="Camera_Click" Margin="0,0,8,8"/>
+            <Button Style="{StaticResource Flat}" Content="🖼  Görsel dosyası seç" Click="File_Click" Margin="0,0,8,8"/>
+            <Button Style="{StaticResource Flat}" Content="📋  Panodaki görsel" Click="Clipboard_Click" Margin="0,0,8,8"/>
+            <Button Style="{StaticResource Flat}" Content="🖥  Ekrandaki QR" Click="Screen_Click" Margin="0,0,8,8"/>
+        </WrapPanel>
+        <TextBlock x:Name="Status" TextWrapping="Wrap" Foreground="{StaticResource Accent}" Margin="0,2,0,0" Visibility="Collapsed"/>
+
+        <Separator Margin="0,16" Background="#FF3A3A44"/>
+
+        <TextBlock Text="Elle ekle" FontSize="17" FontWeight="SemiBold"/>
+        <TextBlock Text="Sitenin verdiği &quot;kurulum anahtarı&quot; (Base32) ya da otpauth:// bağlantısı." Foreground="{StaticResource Fg2}" Margin="0,6,0,10" FontSize="12.5" TextWrapping="Wrap"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/><RowDefinition/><RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Servis" VerticalAlignment="Center"/>
+            <TextBox x:Name="IssuerBox" Grid.Column="1" Style="{StaticResource Field}" Margin="0,0,0,6"/>
+            <TextBlock Grid.Row="1" Text="Hesap" VerticalAlignment="Center"/>
+            <TextBox x:Name="NameBox" Grid.Row="1" Grid.Column="1" Style="{StaticResource Field}" Margin="0,0,0,6"/>
+            <TextBlock Grid.Row="2" Text="Anahtar" VerticalAlignment="Center"/>
+            <TextBox x:Name="SecretBox" Grid.Row="2" Grid.Column="1" Style="{StaticResource Field}" FontFamily="Consolas"/>
+        </Grid>
+        <Button Style="{StaticResource Primary}" Content="Ekle" HorizontalAlignment="Right" Margin="0,12,0,0" Padding="20,6" Click="Manual_Click"/>
+    </StackPanel>
+</Window>

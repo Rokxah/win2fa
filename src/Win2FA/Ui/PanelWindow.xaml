@@ -1,0 +1,280 @@
+<Window x:Class="Win2FA.Ui.PanelWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Win2FA" Width="380" Height="540"
+        WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False" Topmost="True" ShowActivated="True"
+        FontFamily="Segoe UI Variable Text, Segoe UI">
+    <Window.Resources>
+        <FontFamily x:Key="Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource Fg2}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="b" Property="Background" Value="#22FFFFFF"/>
+                                <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="b" Property="Background" Value="#33FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PwBox" TargetType="PasswordBox">
+            <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource Fg}"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="b" Background="#FF26262C" CornerRadius="10" BorderThickness="1" BorderBrush="#FF34343C" Padding="12,9">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="b" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Koyu sağ tık menüsü -->
+        <Style x:Key="DarkMenu" TargetType="ContextMenu">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <!-- Menü, açıldığı simge düğmesinin (Segoe Fluent Icons) yazı tipini devralmasın -->
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="#FF2A2A31" BorderBrush="#FF3C3C46" BorderThickness="1" CornerRadius="8" Padding="4">
+                            <StackPanel IsItemsHost="True"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DarkMenuItem" TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="b" CornerRadius="5" Padding="12,7" Background="Transparent" MinWidth="170">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" Text="{TemplateBinding InputGestureText}" Foreground="#FF6E6E7A" Margin="20,0,0,0"/>
+                                <ContentPresenter ContentSource="Header" TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                            </DockPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="b" Property="Background" Value="#FF3A3A44"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Scrollbar: ince, yuvarlak -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Template>
+                                        <ControlTemplate>
+                                            <Border Background="#44FFFFFF" CornerRadius="3"/>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="14" BorderBrush="#FF34343C" BorderThickness="1" Margin="10">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#FF1E1E24" Offset="0"/>
+                <GradientStop Color="#FF18181D" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.Background>
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="3" Opacity="0.55"/>
+        </Border.Effect>
+        <Grid>
+            <!-- ======== Kasa görünümü ======== -->
+            <Grid x:Name="VaultView" Margin="14,12,14,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DockPanel Margin="2,0,0,10">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE72E;" ToolTip="Şimdi kilitle" Click="Lock_Click"/>
+                    <Button x:Name="HelloToggle" DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE928;" ToolTip="Windows Hello" Click="HelloToggle_Click" Visibility="Collapsed"/>
+                    <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE8B5;" ToolTip="Ekrandaki QR kodu oku" Click="Scan_Click"/>
+                    <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE710;" ToolTip="Hesap ekle / içe aktar" Click="Add_Click"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="22" Height="22" CornerRadius="6" Background="{StaticResource Accent}">
+                            <TextBlock Text="&#xE72E;" FontFamily="{StaticResource Icons}" FontSize="12" Foreground="White"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="Win2FA" Foreground="{StaticResource Fg}" FontSize="15" FontWeight="SemiBold" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <Border Grid.Row="1" Background="#FF26262C" CornerRadius="10" BorderThickness="1" BorderBrush="#FF34343C" x:Name="SearchBorder">
+                    <Grid>
+                        <TextBlock Text="&#xE721;" FontFamily="{StaticResource Icons}" Margin="12,0,0,0" FontSize="13"
+                                   VerticalAlignment="Center" Foreground="{StaticResource Fg2}" IsHitTestVisible="False"/>
+                        <TextBox x:Name="Search" Background="Transparent" BorderThickness="0" Foreground="{StaticResource Fg}"
+                                 CaretBrush="{StaticResource Fg}" FontSize="15" Padding="34,9,10,9"
+                                 TextChanged="Search_TextChanged" PreviewKeyDown="Search_PreviewKeyDown"
+                                 GotKeyboardFocus="Search_Focus" LostKeyboardFocus="Search_Focus"/>
+                        <TextBlock x:Name="Placeholder" Text="Servis ara…" Margin="36,0,0,0" VerticalAlignment="Center"
+                                   Foreground="{StaticResource Fg2}" FontSize="15" IsHitTestVisible="False"/>
+                    </Grid>
+                </Border>
+
+                <ListBox x:Name="List" Grid.Row="2" Margin="-4,10,-6,6" Background="Transparent" BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
+                         MouseDoubleClick="List_MouseDoubleClick" PreviewKeyDown="List_PreviewKeyDown">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Margin" Value="0,0,4,3"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="b" CornerRadius="10" Padding="10,8,6,8" Background="Transparent">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="b" Property="Background" Value="#FF25252C"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="b" Property="Background" Value="#FF263553"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Avatar -->
+                                <Border Width="36" Height="36" CornerRadius="18" Background="{Binding AvatarBrush}" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Initial}" Foreground="White" FontSize="15" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="11,0,6,0">
+                                    <TextBlock Text="{Binding Title}" Foreground="{StaticResource Fg}" FontSize="13.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding Subtitle}" Foreground="{StaticResource Fg2}" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" Text="{Binding CodeDisplay}" Foreground="{Binding CodeBrush}"
+                                           FontFamily="Cascadia Mono, Consolas" FontSize="19" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <!-- Geri sayım halkası -->
+                                <Grid Grid.Column="3" Width="20" Height="20" VerticalAlignment="Center" ToolTip="{Binding SecondsText}">
+                                    <Ellipse Stroke="#33FFFFFF" StrokeThickness="2.5"/>
+                                    <Ellipse Stroke="{Binding CodeBrush}" StrokeThickness="2.5" StrokeDashArray="{Binding RingDash}"
+                                             StrokeDashCap="Flat" RenderTransformOrigin="0.5,0.5">
+                                        <Ellipse.RenderTransform>
+                                            <RotateTransform Angle="-90"/>
+                                        </Ellipse.RenderTransform>
+                                    </Ellipse>
+                                </Grid>
+                                <!-- Kopyala -->
+                                <Button Grid.Column="4" Style="{StaticResource IconButton}" Width="30" Margin="6,0,0,0" ToolTip="Kodu kopyala"
+                                        Content="{Binding CopyIcon}" Click="RowCopy_Click"/>
+                                <Button Grid.Column="5" Style="{StaticResource IconButton}" Width="24" FontSize="13" ToolTip="Düzenle / sil"
+                                        Content="&#xE712;" Click="RowMore_Click"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ContextMenu>
+                        <ContextMenu x:Name="RowMenu" Style="{StaticResource DarkMenu}">
+                            <MenuItem Header="Kodu kopyala" InputGestureText="Enter" Click="Copy_Click" Style="{StaticResource DarkMenuItem}"/>
+                            <MenuItem Header="Düzenle…" InputGestureText="F2" Click="Edit_Click" Style="{StaticResource DarkMenuItem}"/>
+                            <MenuItem Header="Sil…" InputGestureText="Del" Click="Delete_Click" Style="{StaticResource DarkMenuItem}" Foreground="#FFFF6B5B"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+
+                <TextBlock x:Name="Empty" Grid.Row="2" Foreground="{StaticResource Fg2}" TextWrapping="Wrap" TextAlignment="Center"
+                           VerticalAlignment="Center" Margin="24" Visibility="Collapsed" FontSize="13"/>
+
+                <DockPanel Grid.Row="3" Margin="2,4,2,0">
+                    <TextBlock x:Name="Toast" Foreground="#FF5BD68A" FontSize="12" VerticalAlignment="Center"/>
+                    <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" Text="↑↓ seç  ·  ↵ kopyala  ·  Esc kapat"
+                               Foreground="#FF6E6E7A" FontSize="11" VerticalAlignment="Center"/>
+                </DockPanel>
+            </Grid>
+
+            <!-- ======== Kilit / ilk kurulum görünümü ======== -->
+            <Grid x:Name="LockView" Visibility="Collapsed" Margin="30">
+                <StackPanel VerticalAlignment="Center">
+                    <Border Width="64" Height="64" CornerRadius="20" Background="{StaticResource Accent}" HorizontalAlignment="Center">
+                        <TextBlock Text="&#xE72E;" FontFamily="{StaticResource Icons}" FontSize="28" Foreground="White"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock x:Name="LockTitle" Text="Win2FA kilitli" Foreground="{StaticResource Fg}" FontSize="19" FontWeight="SemiBold"
+                               HorizontalAlignment="Center" Margin="0,16,0,4"/>
+                    <TextBlock x:Name="LockHint" Text="Kodları görmek için ana şifreni gir." Foreground="{StaticResource Fg2}" FontSize="12.5"
+                               HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,18"/>
+                    <PasswordBox x:Name="Pw1" Style="{StaticResource PwBox}" KeyDown="Pw_KeyDown"/>
+                    <PasswordBox x:Name="Pw2" Style="{StaticResource PwBox}" KeyDown="Pw_KeyDown" Margin="0,8,0,0" Visibility="Collapsed"/>
+                    <TextBlock x:Name="LockError" Foreground="{StaticResource Warn}" FontSize="12" TextWrapping="Wrap" Margin="2,8,0,0" Visibility="Collapsed"/>
+                    <Button x:Name="UnlockButton" Style="{StaticResource Primary}" Content="Kilidi aç" Margin="0,14,0,0" Padding="0,9" Click="Unlock_Click"/>
+                    <Button x:Name="HelloButton" Style="{StaticResource Flat}" Margin="0,8,0,0" Padding="0,9" Click="HelloUnlock_Click" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE928;" FontFamily="{StaticResource Icons}" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="Windows Hello ile aç" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <TextBlock x:Name="SetupWarn" Visibility="Collapsed" Foreground="#FFE0B050" FontSize="11.5" TextWrapping="Wrap" Margin="0,14,0,0"
+                               Text="Bu şifreyi unutursan Win2FA'daki hesaplar açılamaz. Telefondaki Google Authenticator'ı silme, hesapların orada da dursun."/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
